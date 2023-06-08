@@ -104,35 +104,37 @@ class Manager:
 
     # 保存数据
     def saveFileSystem(self):
-        open('fat', 'wb').write(pickle.dumps(self.fat))
-        open('disk', 'wb').write(pickle.dumps(self.disk))
-        open('catalog', 'wb').write(pickle.dumps(self.root))
+        open(DATA_PATH + '/fat', 'wb').write(pickle.dumps(self.fat))
+        open(DATA_PATH + '/disk', 'wb').write(pickle.dumps(self.disk))
+        open(DATA_PATH + '/catalog', 'wb').write(pickle.dumps(self.root))
 
     # 加载数据
     def loadFileSystem(self):
-        if not os.path.exists('fat'):
+        if not os.path.exists(DATA_PATH):
+            os.mkdir(DATA_PATH)
+        if not os.path.exists(DATA_PATH + '/fat'):
             self.fat = FAT(self.block_num)
-            open('fat', 'wb').write(pickle.dumps(self.fat))
+            open(DATA_PATH + '/fat', 'wb').write(pickle.dumps(self.fat))
         else:
-            self.fat = pickle.load(open('fat', 'rb'))
+            self.fat = pickle.load(open(DATA_PATH + '/fat', 'rb'))
 
-        if not os.path.exists('disk'):
+        if not os.path.exists(DATA_PATH + '/disk'):
             self.disk = [Block(i) for i in range(self.block_num)]
-            open('disk', 'wb').write(pickle.dumps(self.disk))
+            open(DATA_PATH + '/disk', 'wb').write(pickle.dumps(self.disk))
         else:
-            self.disk = pickle.load(open('disk', 'rb'))
+            self.disk = pickle.load(open(DATA_PATH + '/disk', 'rb'))
 
-        if not os.path.exists('catalog'):
+        if not os.path.exists(DATA_PATH + '/catalog'):
             self.root = TreeNode('root', FOLDER, getTime(), )
-            open('catalog', 'wb').write(pickle.dumps(self.root))
+            open(DATA_PATH + '/catalog', 'wb').write(pickle.dumps(self.root))
         else:
-            self.root = pickle.load(open('catalog', 'rb'))
+            self.root = pickle.load(open(DATA_PATH + '/catalog', 'rb'))
 
     # 格式化
     def format(self):
         self.fat = FAT(self.block_num)
-        open('fat', 'wb').write(pickle.dumps(self.fat))
+        open(DATA_PATH + '/fat', 'wb').write(pickle.dumps(self.fat))
         self.disk = [Block(i) for i in range(self.block_num)]
-        open('disk', 'wb').write(pickle.dumps(self.disk))
+        open(DATA_PATH + '/disk', 'wb').write(pickle.dumps(self.disk))
         self.root = TreeNode('root', FOLDER, getTime(), )
-        open('catalog', 'wb').write(pickle.dumps(self.root))
+        open(DATA_PATH + '/catalog', 'wb').write(pickle.dumps(self.root))

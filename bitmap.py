@@ -2,7 +2,7 @@
 class Bitmap:
     def __init__(self, size):
         self.size = size
-        # python中整型的长度不限 自动调整
+        # python中 整型的长度不限 自动调整
         # 以最低位为下标0
         self.bitmap = 0
 

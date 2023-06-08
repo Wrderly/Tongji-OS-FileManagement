@@ -20,12 +20,12 @@ class MainWindow(QMainWindow):
         self.widGet = QWidget()
         self.widGet.setLayout(grid)
         self.setCentralWidget(self.widGet)
-        # 菜单栏
+        # 添加菜单，绑定行为
         menu_bar = self.menuBar()
-        # 添加菜单
         menu_bar.addAction('格式化', self.format)
+        # 加入工具栏
         self.tool_bar = self.addToolBar('工具栏')
-        # 返回
+        # 返回事件
         self.backAction = QAction(QIcon('img/back.png'), '&返回', self)
         self.backAction.triggered.connect(self.backEvent)
         self.tool_bar.addAction(self.backAction)
@@ -38,11 +38,13 @@ class MainWindow(QMainWindow):
         # 图标
         self.cur_path.addAction(QIcon('img/folder.png'), QLineEdit.LeadingPosition)
         self.cur_path.setMinimumHeight(40)
+        # 设置布局
         ptr_layout = QFormLayout()
         ptr_layout.addRow(self.cur_path)
         ptr_widget = QWidget()
         ptr_widget.setLayout(ptr_layout)
         ptr_widget.adjustSize()
+        # 调用布局
         self.tool_bar.addWidget(ptr_widget)
         self.tool_bar.setMovable(False)
         # 文件显示窗口
@@ -59,9 +61,9 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.list_view, 1, 1)
         # 右击菜单绑定
         self.list_view.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.list_view.customContextMenuRequested.connect(self.show_menu)
-        # 底栏信息
-        self.update_bottom_label()
+        self.list_view.customContextMenuRequested.connect(self.showMenu)
+        # 顶栏与底栏信息
+        self.update_info_label()
 
     # 加载文件信息图标 仅在打开/退出文件夹时调用
     def loadCurFile(self):
@@ -79,7 +81,7 @@ class MainWindow(QMainWindow):
                 self.list_view.addItem(self.item)
 
     # 打开文件
-    def openFile(self, modelindex: QModelIndex)->None:
+    def openFile(self, modelindex: QModelIndex) -> None:
         # 关闭编辑
         self.list_view.closeEdit()
         # 获取点击的图标
@@ -113,7 +115,7 @@ class MainWindow(QMainWindow):
             # 允许返回上一级事件
             self.backAction.setEnabled(True)
             # 更新底栏
-            self.update_bottom_label()
+            self.update_info_label()
 
     # 删除文件
     def deleteFile(self):
@@ -144,7 +146,7 @@ class MainWindow(QMainWindow):
         # 删除文件(子节点)
         self.manager.deleteChild(self.manager.cur, index)
         # 更新底栏
-        self.update_bottom_label()
+        self.update_info_label()
 
     # 重命名
     def rename(self):
@@ -169,8 +171,11 @@ class MainWindow(QMainWindow):
         self.manager.createChild(self.manager.cur, "新建文件", FILE)
 
     # 底栏
-    def update_bottom_label(self):
-        self.statusBar().showMessage(str(len(self.manager.cur.children)) + '个项目'.ljust(211) + '学号:2154168 姓名:王鹏')
+    def update_info_label(self):
+        # 更新底栏信息
+        self.statusBar().showMessage(
+            str(len(self.manager.cur.children)) + '个项目'.ljust(211) + '学号:2154168 姓名:王鹏')
+        # 更新顶栏信息 当前路径信息
         s = ''
         for i in range(len(self.manager.path_record)):
             s += self.manager.path_record[i]
@@ -193,7 +198,7 @@ class MainWindow(QMainWindow):
             self.child.show()
 
     # 右键菜单
-    def show_menu(self, point):
+    def showMenu(self, point):
         # 右键菜单
         menu = QMenu(self.list_view)
         if len(self.list_view.selectedItems()) != 0:  # 右击选中文件
@@ -231,7 +236,7 @@ class MainWindow(QMainWindow):
             create_file_action = QAction(QIcon('img/file.png'), '文件')
             create_file_action.triggered.connect(self.createFile)
             create_menu.addAction(create_file_action)
-
+            # 加载该二级菜单
             create_menu.setIcon(QIcon('img/create.png'))
             menu.addMenu(create_menu)
             # 属性选项
@@ -277,7 +282,7 @@ class MainWindow(QMainWindow):
         # 更新界面
         self.loadCurFile()
         self.list_view.cur_node = self.manager.cur
-        self.update_bottom_label()
+        self.update_info_label()
         # 返回到根目录则禁用返回事件
         if self.manager.cur == self.manager.root:
             self.backAction.setEnabled(False)

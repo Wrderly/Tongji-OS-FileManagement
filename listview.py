@@ -10,13 +10,13 @@ from config import *
 class ListView(QListWidget):
     def __init__(self, cur_node, parents, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
-        # # 拖拽设置
+        # 拖拽设置
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
         self.setDragDropMode(QAbstractItemView.DragDrop)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDefaultDropAction(Qt.CopyAction)
-        # 双击编辑
+        # 选中变化事件
         self.edited_item = self.currentItem()
         self.currentItemChanged.connect(self.closeEdit)
         # 当前目录
