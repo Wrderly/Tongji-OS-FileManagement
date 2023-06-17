@@ -14,22 +14,24 @@ class MainWindow(QMainWindow):
         # 窗口创建
         self.resize(1080, 720)
         self.setWindowTitle('操作系统课程项目 文件管理系统')
+        self.setMinimumHeight(320)
+        self.setMinimumWidth(480)
         # 窗口布局
         grid = QGridLayout()
         grid.setSpacing(10)
-        self.widGet = QWidget()
-        self.widGet.setLayout(grid)
-        self.setCentralWidget(self.widGet)
+        self.wid_get = QWidget()
+        self.wid_get.setLayout(grid)
+        self.setCentralWidget(self.wid_get)
         # 添加菜单，绑定行为
         menu_bar = self.menuBar()
         menu_bar.addAction('格式化', self.format)
         # 加入工具栏
         self.tool_bar = self.addToolBar('工具栏')
         # 返回事件
-        self.backAction = QAction(QIcon('img/back.png'), '&返回', self)
-        self.backAction.triggered.connect(self.backEvent)
-        self.tool_bar.addAction(self.backAction)
-        self.backAction.setEnabled(False)
+        self.back_action = QAction(QIcon('img/back.png'), '&返回', self)
+        self.back_action.triggered.connect(self.backEvent)
+        self.tool_bar.addAction(self.back_action)
+        self.back_action.setEnabled(False)
         self.tool_bar.addSeparator()
         # 当前所在路径
         self.cur_path = QLineEdit()
@@ -49,7 +51,7 @@ class MainWindow(QMainWindow):
         self.tool_bar.setMovable(False)
         # 文件显示窗口
         self.list_view = ListView(self.manager.cur, parents=self)
-        self.list_view.setMinimumHeight(600)
+        self.list_view.setMinimumHeight(240)
         self.list_view.setViewMode(QListView.IconMode)
         self.list_view.setIconSize(QSize(72, 72))
         self.list_view.setGridSize(QSize(100, 100))
@@ -63,7 +65,7 @@ class MainWindow(QMainWindow):
         self.list_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.list_view.customContextMenuRequested.connect(self.showMenu)
         # 顶栏与底栏信息
-        self.update_info_label()
+        self.updateInfoLabel()
 
     # 加载文件信息图标 仅在打开/退出文件夹时调用
     def loadCurFile(self):
@@ -113,9 +115,9 @@ class MainWindow(QMainWindow):
             self.loadCurFile()
             self.list_view.cur_node = self.manager.cur
             # 允许返回上一级事件
-            self.backAction.setEnabled(True)
+            self.back_action.setEnabled(True)
             # 更新底栏
-            self.update_info_label()
+            self.updateInfoLabel()
 
     # 删除文件
     def deleteFile(self):
@@ -125,28 +127,29 @@ class MainWindow(QMainWindow):
         item = self.list_view.selectedItems()[-1]
         index = self.list_view.selectedIndexes()[-1].row()
         # 提示框
-        reply = QMessageBox()
-        reply.setWindowTitle('提醒')
+        reply_info = QMessageBox()
+        reply_info.setWindowTitle('提醒')
         if self.manager.cur.children[index].type == FILE:
-            reply.setText('确定要删除文件' + item.text() + '吗？')
+            reply_info.setText('确定要删除文件' + item.text() + '吗？')
         else:
-            reply.setText('确定要删除文件夹' + item.text() + '及其内部所有文件吗？')
-        reply.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        button_yes = reply.button(QMessageBox.Yes)
+            reply_info.setText('确定要删除文件夹' + item.text() +
+                          '及其内部' + str(self.manager.calSize(self.manager.cur.children[index])) + '个项目吗？')
+        reply_info.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        button_yes = reply_info.button(QMessageBox.Yes)
         button_yes.setText('确定')
-        button_no = reply.button(QMessageBox.No)
+        button_no = reply_info.button(QMessageBox.No)
         button_no.setText('取消')
-        reply.exec_()
+        reply_info.exec_()
 
-        if reply.clickedButton() == button_no:
+        if reply_info.clickedButton() == button_no:
             return
-        # 加载界面
-        self.listView.takeItem(index)
+        # 更新界面
+        self.list_view.takeItem(index)
         del item
         # 删除文件(子节点)
         self.manager.deleteChild(self.manager.cur, index)
         # 更新底栏
-        self.update_info_label()
+        self.updateInfoLabel()
 
     # 重命名
     def rename(self):
@@ -171,10 +174,10 @@ class MainWindow(QMainWindow):
         self.manager.createChild(self.manager.cur, "新建文件", FILE)
 
     # 底栏
-    def update_info_label(self):
+    def updateInfoLabel(self):
         # 更新底栏信息
         self.statusBar().showMessage(
-            str(len(self.manager.cur.children)) + '个项目'.ljust(211) + '学号:2154168 姓名:王鹏')
+            '学号:2154168 姓名:王鹏 | 当前层级共' + str(len(self.manager.cur.children)) + '个项目')
         # 更新顶栏信息 当前路径信息
         s = ''
         for i in range(len(self.manager.path_record)):
@@ -185,16 +188,16 @@ class MainWindow(QMainWindow):
     def viewAttribute(self):
         if len(self.list_view.selectedItems()) == 0:  # 选中的当前目录
             path = self.manager.getCurPath()
-            self.child = AttributeForm(self.manager.cur, path)
+            self.child = AttributeForm(self.manager.cur, path, self.manager.calSize(self.manager.cur))
             self.child.show()
         else:
             index = self.list_view.selectedIndexes()[-1].row()
             node = self.manager.cur.children[index]
             path = self.manager.getCurChildPath(index)
             if node.type == FILE:
-                self.child = AttributeForm(node, path)
+                self.child = AttributeForm(node, path, self.manager.calSize(node))
             else:
-                self.child = AttributeForm(node, path)
+                self.child = AttributeForm(node, path, self.manager.calSize(node))
             self.child.show()
 
     # 右键菜单
@@ -252,18 +255,18 @@ class MainWindow(QMainWindow):
         # 结束编辑
         self.list_view.closeEdit()
         # 提示框
-        reply = QMessageBox()
-        reply.setWindowTitle('警告')
-        reply.setText('确定要格式化磁盘吗？此操作将清空所有数据')
-        reply.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        button_yes = reply.button(QMessageBox.Yes)
+        reply_info = QMessageBox()
+        reply_info.setWindowTitle('警告')
+        reply_info.setText('确定要格式化磁盘吗？此操作将清空所有数据')
+        reply_info.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        button_yes = reply_info.button(QMessageBox.Yes)
         button_yes.setText('确定')
-        button_no = reply.button(QMessageBox.No)
+        button_no = reply_info.button(QMessageBox.No)
         button_no.setText('取消')
-        reply.exec_()
-        reply.show()
+        reply_info.exec_()
+        reply_info.show()
 
-        if reply.clickedButton() == button_no:
+        if reply_info.clickedButton() == button_no:
             return
         self.manager.format()  # 格式化文件系统
         # 重启界面
@@ -282,10 +285,10 @@ class MainWindow(QMainWindow):
         # 更新界面
         self.loadCurFile()
         self.list_view.cur_node = self.manager.cur
-        self.update_info_label()
+        self.updateInfoLabel()
         # 返回到根目录则禁用返回事件
         if self.manager.cur == self.manager.root:
-            self.backAction.setEnabled(False)
+            self.back_action.setEnabled(False)
         return True
 
     # 写文件事件

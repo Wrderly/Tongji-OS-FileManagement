@@ -9,7 +9,8 @@ class EditForm(QWidget):
     def __init__(self, name, data):
         super().__init__()
         # 编辑器外观设置
-        self.resize(412, 412)
+        self.resize(480, 480)
+        self.setMinimumSize(320, 320)
         self.setWindowTitle(name)
         self.name = name
         self.setWindowIcon(QIcon('img/file.png'))
@@ -19,7 +20,7 @@ class EditForm(QWidget):
         self.file_editor.setText(data)  # 初始文本
         self.file_editor.setPlaceholderText("在此输入文件内容")  # 设置占位字符串
         # 保存初始数据
-        self.originalData = data
+        self.original_data = data
         # 布局
         self.h_layout = QHBoxLayout()
         self.v_layout = QVBoxLayout()
@@ -31,27 +32,27 @@ class EditForm(QWidget):
     # 关闭文本编辑器
     def closeEvent(self, event):
         # 如果没有对文本做出修改
-        if self.originalData == self.file_editor.toPlainText():
+        if self.original_data == self.file_editor.toPlainText():
             # 直接退出
             event.accept()
             return
 
         # 提示信息
-        reply = QMessageBox()
-        reply.setWindowTitle('提醒')
-        reply.setText('是否保存修改?')
-        reply.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Ignore)
-        button_save = reply.button(QMessageBox.Yes)
+        reply_info = QMessageBox()
+        reply_info.setWindowTitle('提醒')
+        reply_info.setText('是否保存修改?')
+        reply_info.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Ignore)
+        button_save = reply_info.button(QMessageBox.Yes)
         button_save.setText('保存')
-        button_not_save = reply.button(QMessageBox.No)
+        button_not_save = reply_info.button(QMessageBox.No)
         button_not_save.setText('不保存')
-        button_cancel = reply.button(QMessageBox.Ignore)
+        button_cancel = reply_info.button(QMessageBox.Ignore)
         button_cancel.setText('取消')
-        reply.exec_()
+        reply_info.exec_()
 
-        if reply.clickedButton() == button_cancel:  # 取消则忽略事件
+        if reply_info.clickedButton() == button_cancel:  # 取消则忽略事件
             event.ignore()
-        elif reply.clickedButton() == button_save:  # 保存则返回新数据
+        elif reply_info.clickedButton() == button_save:  # 保存则返回新数据
             self._signal.emit(self.file_editor.toPlainText())
             event.accept()  # 退出
         else:

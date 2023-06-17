@@ -19,5 +19,8 @@ class Block:
         self.data += new_data[:self.block_size-len(self.data)]
         return new_data[self.block_size-len(self.data):]
 
+    def size(self):
+        return len(self.data)
+
     def clear(self):
         self.data = ''

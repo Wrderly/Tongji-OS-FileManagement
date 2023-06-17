@@ -4,7 +4,7 @@ from PyQt5.Qt import QWidget, QIcon, QGridLayout, QFont, QLabel
 
 # 属性面板
 class AttributeForm(QWidget):
-    def __init__(self, node, node_path):
+    def __init__(self, node, node_path, size):
         super().__init__()
         # 外观设置
         self.resize(256, 196)
@@ -41,12 +41,18 @@ class AttributeForm(QWidget):
         minute = minute.zfill(2)
         update_label.setText(f'修改时间：{year}年{month}月{day}日 {hour}:{minute}')
         update_label.setFont(font)
+        # 体积
         if node.isFile():
             grid.addWidget(update_label, 2, 0)
+            size_label = QLabel(self)
+            size_label.setText('文件大小:' + str(size) + '')
+            size_label.setFont(font)
+            grid.addWidget(size_label, 3, 0)
         else:
             grid.addWidget(update_label, 2, 0)
             num_label = QLabel(self)
-            num_label.setText('包含' + str(len(node.children)) + '个项目')
+            # num_label.setText('包含' + str(len(node.children)) + '个项目')
+            num_label.setText('包含' + str(size) + '个项目')
             num_label.setFont(font)
             grid.addWidget(num_label, 3, 0)
         self.setLayout(grid)

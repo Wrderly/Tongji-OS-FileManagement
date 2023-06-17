@@ -46,3 +46,10 @@ class FAT:
             # disk[cur].clear()
             self.bitmap.set_bit(index=cur, value=0)
             cur = next
+
+    def size(self, cur, disk):
+        size = 0
+        while cur != -1:
+            size += disk[cur].size()
+            cur = self.fat[cur]
+        return size

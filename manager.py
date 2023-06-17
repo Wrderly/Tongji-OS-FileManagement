@@ -93,6 +93,20 @@ class Manager:
         paths += self.cur.children[index].name
         return paths
 
+    def calSize(self, node: TreeNode):
+        if node.type == FOLDER:
+            size = 0
+            for i in range(len(node.children)):
+                child_node: TreeNode = node.children[i]
+                if child_node.type == FOLDER:
+                    size += self.calSize(child_node)
+                    size += 1
+                elif child_node.type == FILE:
+                    size += 1
+            return size
+        elif node.type == FILE:
+            return node.file.size(self.fat, self.disk)
+
     # 打印
     def show(self):
         print(' ')

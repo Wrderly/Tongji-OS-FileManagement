@@ -22,3 +22,6 @@ class FCB:
     # 重命名文件
     def rename(self, new_name):
         self.file_name = new_name
+
+    def size(self, fat, disk):
+        return fat.size(self.start, disk)

@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QListWidget, QWidget, QAbstractItemView
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtCore import Qt
-from config import *
+# from config import *
 
 
 # 文件系统显示窗口
@@ -24,7 +24,7 @@ class ListView(QListWidget):
         # 父亲目录
         self.parents = parents
         # # 正在被编辑状态
-        self.isEdit = False
+        self.is_edit = False
 
     # 按键事件
     def keyPressEvent(self, e: QKeyEvent) -> None:
@@ -49,7 +49,7 @@ class ListView(QListWidget):
         self.edited_item = item
         self.openPersistentEditor(item)
         self.editItem(item)
-        self.isEdit = True
+        self.is_edit = True
         self.index = index
 
     # 编辑被选中项目
@@ -61,13 +61,13 @@ class ListView(QListWidget):
         self.edited_item = item
         self.openPersistentEditor(item)
         self.editItem(item)
-        self.isEdit = True
+        self.is_edit = True
         self.index = index
 
     # 关闭编辑
     def closeEdit(self, *_) -> None:
-        if self.edited_item and self.isEdit:  # 被选中图标
-            self.isEdit = False
+        if self.edited_item and self.is_edit:  # 被选中图标
+            self.is_edit = False
             self.closePersistentEditor(self.edited_item)
             # 重名检查
             while True:
